@@ -1,9 +1,8 @@
 <?php
 /**
  * Plugin Name: TNL Cart Discounts
- * Description: Zastosuj niestandardowe zasady rabatowe w zależności od ilości produktów w koszyku, z pominięciem produktów typu 'weight'.
- * Version: 1.5.0
- * Author: Twoje Imię
+ * Description: Zastosuj niestandardowe zasady rabatowe w zależności od ilości produktów w koszyku, z pominięciem produktów typu 'weight' i 'pallet_weight'.
+ * Version: 1.6.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,7 +31,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
                 return;
             }
 
-            // Pobierz kwalifikujące się pozycje koszyka (z pominięciem produktów typu 'weight')
+            // Pobierz kwalifikujące się pozycje koszyka (z pominięciem produktów typu 'weight' i 'pallet_weight')
             $eligible_items = $this->get_eligible_cart_items( $cart );
 
             $total_quantity = array_sum( wp_list_pluck( $eligible_items, 'quantity' ) );
@@ -45,7 +44,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
         }
 
         /**
-         * Pobiera kwalifikujące się pozycje koszyka z pominięciem produktów typu 'weight'.
+         * Pobiera kwalifikujące się pozycje koszyka z pominięciem produktów typu 'weight' i 'pallet_weight'.
          *
          * @param WC_Cart $cart
          * @return array
@@ -57,8 +56,8 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
                 $product_id    = $cart_item['product_id'];
                 $shipping_cost = get_field( 'shipping_cost', $product_id );
 
-                // Pomijaj produkty typu 'weight'
-                if ( $shipping_cost !== 'weight' ) {
+                // Pomijaj produkty typu 'weight' i 'pallet_weight'
+                if ( $shipping_cost !== 'weight' && $shipping_cost !== 'pallet_weight' ) {
                     $eligible_items[ $cart_item_key ] = $cart_item;
                 }
             }
@@ -121,7 +120,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
                     $discount = $cheapest_price - 1;
 
                     if ( $discount > 0 ) {
-                        $fee_title = 'Rabat specjalny (Najtańszy produkt za 1 zł)';
+                        $fee_title = 'Najtańszy produkt za 1 zł';
                         $cart->add_fee( $fee_title, -$discount );
                     }
                 }
