@@ -2,8 +2,8 @@
 /**
  * Plugin Name: TNL Cart Discounts
  * Description: Zastosuj niestandardowe zasady rabatowe w zależności od ilości produktów w koszyku, z pominięciem produktów typu 'weight'.
- * Version: 1.4.0
- * Text Domain: tnl-cart-discounts
+ * Version: 1.5.0
+ * Author: Twoje Imię
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -101,33 +101,29 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
          * @param array   $eligible_items
          */
         private function apply_special_discount( $cart, $eligible_items ) {
-            $prices = array();
+            $product_prices = array();
 
-            // Zbierz wszystkie ceny z uwzględnieniem ilości
+            // Zbierz ceny produktów bez uwzględnienia ilości
             foreach ( $eligible_items as $cart_item ) {
                 $product_price = $cart_item['data']->get_price();
-                $quantity      = $cart_item['quantity'];
-
-                for ( $i = 0; $i < $quantity; $i++ ) {
-                    $prices[] = $product_price;
-                }
+                $product_prices[] = $product_price;
             }
 
-            if ( count( $prices ) >= 4 ) {
-                // Posortuj ceny rosnąco
-                sort( $prices );
-                // Wybierz cztery najtańsze produkty
-                $first_four_prices = array_slice( $prices, 0, 4 );
+            if ( count( $product_prices ) > 0 ) {
+                // Znajdź najniższą cenę spośród wszystkich produktów
+                $cheapest_price = min( $product_prices );
 
-                // Znajdź najniższą cenę spośród tych czterech
-                $cheapest_price = min( $first_four_prices );
+                // Sprawdź, czy ilość kwalifikujących się produktów jest co najmniej 4
+                $total_quantity = array_sum( wp_list_pluck( $eligible_items, 'quantity' ) );
 
-                // Oblicz rabat, aby najtańszy produkt kosztował 1 zł
-                $discount = $cheapest_price - 1;
+                if ( $total_quantity >= 4 ) {
+                    // Oblicz rabat, aby jedna sztuka najtańszego produktu kosztowała 1 zł
+                    $discount = $cheapest_price - 1;
 
-                if ( $discount > 0 ) {
-                    $fee_title = 'Rabat specjalny (Najtańszy produkt za 1 zł)';
-                    $cart->add_fee( $fee_title, -$discount );
+                    if ( $discount > 0 ) {
+                        $fee_title = 'Rabat specjalny (Najtańszy produkt za 1 zł)';
+                        $cart->add_fee( $fee_title, -$discount );
+                    }
                 }
             }
         }
