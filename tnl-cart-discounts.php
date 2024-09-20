@@ -3,7 +3,6 @@
  * Plugin Name: TNL Cart Discounts
  * Description: Zastosuj niestandardowe zasady rabatowe w zależności od ilości produktów w koszyku, z pominięciem produktów typu 'weight'.
  * Version: 1.3.1
- * Author: Twoje Imię
  * Text Domain: tnl-cart-discounts
  */
 
