@@ -1,13 +1,14 @@
 <?php
 /**
  * Plugin Name: TNL Cart Discounts
- * Description: Applies custom discount rules based on cart item quantities, excluding products of type 'weight'.
- * Version: 1.3.0
+ * Description: Zastosuj niestandardowe zasady rabatowe w zależności od ilości produktów w koszyku, z pominięciem produktów typu 'weight'.
+ * Version: 1.3.1
+ * Author: Twoje Imię
  * Text Domain: tnl-cart-discounts
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
+    exit; // Wyjdź, jeśli uzyskano dostęp bezpośrednio
 }
 
 if ( ! class_exists( 'TNLCartDiscounts' ) ) {
@@ -19,7 +20,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
         }
 
         /**
-         * Applies custom discounts to the cart.
+         * Zastosuj niestandardowe rabaty do koszyka.
          *
          * @param WC_Cart $cart
          */
@@ -32,7 +33,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
                 return;
             }
 
-            // Get eligible cart items (excluding 'weight' type products)
+            // Pobierz kwalifikujące się pozycje koszyka (z pominięciem produktów typu 'weight')
             $eligible_items = $this->get_eligible_cart_items( $cart );
 
             $total_quantity = array_sum( wp_list_pluck( $eligible_items, 'quantity' ) );
@@ -45,7 +46,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
         }
 
         /**
-         * Retrieves eligible cart items excluding 'weight' type products.
+         * Pobiera kwalifikujące się pozycje koszyka z pominięciem produktów typu 'weight'.
          *
          * @param WC_Cart $cart
          * @return array
@@ -57,7 +58,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
                 $product_id    = $cart_item['product_id'];
                 $shipping_cost = get_field( 'shipping_cost', $product_id );
 
-                // Exclude 'weight' type products
+                // Pomijaj produkty typu 'weight'
                 if ( $shipping_cost !== 'weight' ) {
                     $eligible_items[ $cart_item_key ] = $cart_item;
                 }
@@ -67,7 +68,7 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
         }
 
         /**
-         * Applies a percentage discount based on quantity.
+         * Zastosuj procentowy rabat w zależności od ilości.
          *
          * @param WC_Cart $cart
          * @param array   $eligible_items
@@ -89,13 +90,13 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
             }
 
             if ( $discount > 0 ) {
-                $fee_title = sprintf( __( 'Discount (%d%%)', 'tnl-cart-discounts' ), $percentage );
+                $fee_title = sprintf( 'Rabat (%d%%)', $percentage );
                 $cart->add_fee( $fee_title, -$discount );
             }
         }
 
         /**
-         * Applies the special discount for 4 or more items.
+         * Zastosuj specjalny rabat dla 4 lub więcej pozycji.
          *
          * @param WC_Cart $cart
          * @param array   $eligible_items
@@ -116,19 +117,19 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
                 }
 
                 if ( $item_count >= 4 ) {
-                    break; // We've collected the first four items
+                    break; // Zebraliśmy pierwsze cztery pozycje
                 }
             }
 
             if ( ! empty( $prices ) ) {
-                // Find the cheapest price among the first four items
+                // Znajdź najtańszą cenę spośród pierwszych czterech pozycji
                 $cheapest_price = min( $prices );
 
-                // Calculate discount so that the cheapest item costs 1 zł
+                // Oblicz rabat, aby najtańsza pozycja kosztowała 1 zł
                 $discount = $cheapest_price - 1;
 
                 if ( $discount > 0 ) {
-                    $fee_title = __( 'Special Discount (Cheapest item for 1 zł)', 'tnl-cart-discounts' );
+                    $fee_title = 'Rabat specjalny (Najtańszy produkt za 1 zł)';
                     $cart->add_fee( $fee_title, -$discount );
                 }
             }
