@@ -2,7 +2,7 @@
 /**
  * Plugin Name: TNL Cart Discounts
  * Description: Zastosuj niestandardowe zasady rabatowe w zależności od ilości produktów w koszyku, z pominięciem produktów typu 'weight'.
- * Version: 1.3.1
+ * Version: 1.4.0
  * Text Domain: tnl-cart-discounts
  */
 
@@ -101,30 +101,28 @@ if ( ! class_exists( 'TNLCartDiscounts' ) ) {
          * @param array   $eligible_items
          */
         private function apply_special_discount( $cart, $eligible_items ) {
-            $prices     = array();
-            $item_count = 0;
+            $prices = array();
 
+            // Zbierz wszystkie ceny z uwzględnieniem ilości
             foreach ( $eligible_items as $cart_item ) {
                 $product_price = $cart_item['data']->get_price();
                 $quantity      = $cart_item['quantity'];
 
                 for ( $i = 0; $i < $quantity; $i++ ) {
-                    if ( $item_count < 4 ) {
-                        $prices[] = $product_price;
-                        $item_count++;
-                    }
-                }
-
-                if ( $item_count >= 4 ) {
-                    break; // Zebraliśmy pierwsze cztery pozycje
+                    $prices[] = $product_price;
                 }
             }
 
-            if ( ! empty( $prices ) ) {
-                // Znajdź najtańszą cenę spośród pierwszych czterech pozycji
-                $cheapest_price = min( $prices );
+            if ( count( $prices ) >= 4 ) {
+                // Posortuj ceny rosnąco
+                sort( $prices );
+                // Wybierz cztery najtańsze produkty
+                $first_four_prices = array_slice( $prices, 0, 4 );
 
-                // Oblicz rabat, aby najtańsza pozycja kosztowała 1 zł
+                // Znajdź najniższą cenę spośród tych czterech
+                $cheapest_price = min( $first_four_prices );
+
+                // Oblicz rabat, aby najtańszy produkt kosztował 1 zł
                 $discount = $cheapest_price - 1;
 
                 if ( $discount > 0 ) {
