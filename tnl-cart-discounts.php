@@ -3,7 +3,6 @@
  * Plugin Name: TNL Cart Discounts
  * Description: Applies custom discount rules based on cart item quantities, excluding products of type 'weight'.
  * Version: 1.3.0
- * Author: Your Name
  * Text Domain: tnl-cart-discounts
  */
 
